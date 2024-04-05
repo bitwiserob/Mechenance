@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prediction Results</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Prediction Results</h2>
+        {% if form_data %}
+            <div class="card my-4">
+                <div class="card-body">
+                    <p>Air Temp [K]: {{ form_data.air_temp }}</p>
+                    <p>Rotational Speed [rpm]: {{ form_data.rpm }}</p>
+                    <p>Torque [Nm]: {{ form_data.nm }}</p>
+                    <p>Tool Wear: {{ form_data.min }}</p>
+                </div>
+            </div>
+        {% else %}
+            <p>No data submitted.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
