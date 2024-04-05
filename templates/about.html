@@ -1,8 +1,7 @@
-<!-- templates/index.html -->
 <!DOCTYPE html>
 <html>
   <head>
-    <title>My Flask App</title>
+    <title>About - Mechenance</title>
     <!-- Bootstrap CSS -->
     <link
       rel="stylesheet"
@@ -34,8 +33,8 @@
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="#">Home</a>
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
           </li>
           <li class="nav-item active">
             <a class="nav-link" href="/about">About</a>
@@ -46,41 +45,17 @@
         </ul>
       </div>
     </nav>
-    <!-- MODEL - 1: 
 
-INPUTS
-
-# Air temperature [K]
-
-# Rotational speed [rpm]
-
-# Torque [Nm]
-
-# Tool wear [min]
-
-OUTPUTS:
-
-# Prediction (Failure Type) -->
+    <!-- About Description -->
     <div class="container">
       <div class="card my-4">
         <div class="card-body">
-          <form action="/predict" method="POST">
-            <div class="form-group">
-                <label for="air_temp_input">Air Temp [K]</label>
-                <input type="text" class="form-control" id="air_temp" name="air_temp" placeholder="Enter Air temp">
-        
-                <label for="rpm_input">Rotational speed [rpm]</label>
-                <input type="text" class="form-control" id="rpm_input" name="rpm" placeholder="Enter rotational speed">
-        
-                <label for="nm_input">Torque [Nm]</label>
-                <input type="text" class="form-control" id="nm" name="nm" placeholder="Enter Torque">
-        
-                <label for="min_input">Tool Wear</label>
-                <input type="text" class="form-control" id="min" name="min" placeholder="Enter Tool Wear">
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-        
+          <h2>About Mechenance</h2>
+          <p>Welcome to Mechenance, a cutting-edge platform designed to leverage advanced analytics and machine learning to predict mechanical failures before they occur. Our tool integrates seamlessly with your existing infrastructure, providing real-time insights and actionable intelligence to prevent costly downtime and enhance operational efficiency.</p>
+          
+          <p>Founded by a team of experienced engineers and data scientists, Mechenance is committed to driving innovation in the field of predictive maintenance. Our mission is to empower businesses to maximize productivity and ensure reliability in their operations.</p>
+
+          <p>For more information about our solutions or to schedule a demo, please contact us. We look forward to partnering with you on your journey to operational excellence.</p>
         </div>
       </div>
     </div>
