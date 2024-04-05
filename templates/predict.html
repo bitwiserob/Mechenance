@@ -48,7 +48,6 @@
         {% if form_data %}
             <div class="card my-4">
                 <div class="card-body">
-                    <p>{{ form_data }}</p>
                     <p>Air Temp [K]: {{ form_data.air_temp }}</p>
                     <p>Rotational Speed [rpm]: {{ form_data.rpm }}</p>
                     <p>Torque [Nm]: {{ form_data.nm }}</p>
@@ -58,11 +57,12 @@
         {% else %}
             <p>No data submitted.</p>
         {% endif %}
+        <div id="plot"></div>
+        <script>
+            var plotData = {{ graphJSON|safe }};
+            Plotly.newPlot('plot', plotData);
+        </script>
     </div>
-    <div id="plot"></div>
-    <script>
-        var plotData = {{ graphJSON|safe }};
-        Plotly.newPlot('plot', plotData);
-    </script>
+    
 </body>
 </html>
