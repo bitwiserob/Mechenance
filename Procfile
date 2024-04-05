@@ -1,1 +1,1 @@
-web: gunicorn MECHENANCE:app
+web: gunicorn mechenance:app
