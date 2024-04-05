@@ -3,6 +3,8 @@
 <head>
     <title>Prediction Results</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
 </head>
  <!-- Navbar -->
  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -57,5 +59,10 @@
             <p>No data submitted.</p>
         {% endif %}
     </div>
+    <div id="plot"></div>
+    <script>
+        var plotData = {{ graphJSON|safe }};
+        Plotly.newPlot('plot', plotData);
+    </script>
 </body>
 </html>
