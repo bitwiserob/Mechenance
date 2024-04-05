@@ -6,7 +6,7 @@
 </head>
  <!-- Navbar -->
  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="#">
+    <a class="navbar-brand" href="/">
       <img
         src="{{ url_for('static', filename='brand.png') }}"
         alt="Brand Logo"
@@ -42,10 +42,11 @@
   </nav>
 <body>
     <div class="container">
-        <h2>Prediction Results</h2>
+        <h2 class="pt-2">Prediction Results</h2>
         {% if form_data %}
             <div class="card my-4">
                 <div class="card-body">
+                    <p>{{ form_data }}</p>
                     <p>Air Temp [K]: {{ form_data.air_temp }}</p>
                     <p>Rotational Speed [rpm]: {{ form_data.rpm }}</p>
                     <p>Torque [Nm]: {{ form_data.nm }}</p>

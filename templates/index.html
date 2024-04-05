@@ -12,7 +12,7 @@
   <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <a class="navbar-brand" href="#">
+      <a class="navbar-brand" href="/">
         <img
           src="{{ url_for('static', filename='brand.png') }}"
           alt="Brand Logo"
@@ -66,40 +66,21 @@ OUTPUTS:
         <div class="card-body">
           <form action="/predict" method="POST">
             <div class="form-group">
-              <label for="air_temp_input">Air Temp [K]</label>
-              <input
-                type="text"
-                class="form-control"
-                id="air_temp_input"
-                placeholder="Enter Air temp"
-              />
-
-              <label for="rpm_input">Rotational speed [rpm]</label>
-              <input
-                type="text"
-                class="form-control"
-                id="rpm_input"
-                placeholder="Enter rotational speed"
-              />
-
-              <label for="nm_input">Torque [Nm]</label>
-              <input
-                type="text"
-                class="form-control"
-                id="nm_input"
-                placeholder="Enter Torque"
-              />
-
-              <label for="min_input">Tool Wear</label>
-              <input
-                type="text"
-                class="form-control"
-                id="min_input"
-                placeholder="Enter Tool Wear"
-              />
+                <label for="air_temp_input">Air Temp [K]</label>
+                <input type="text" class="form-control" id="air_temp" name="air_temp" placeholder="Enter Air temp">
+        
+                <label for="rpm_input">Rotational speed [rpm]</label>
+                <input type="text" class="form-control" id="rpm_input" name="rpm" placeholder="Enter rotational speed">
+        
+                <label for="nm_input">Torque [Nm]</label>
+                <input type="text" class="form-control" id="nm" name="nm" placeholder="Enter Torque">
+        
+                <label for="min_input">Tool Wear</label>
+                <input type="text" class="form-control" id="min" name="min" placeholder="Enter Tool Wear">
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
-          </form>
+        </form>
+        
         </div>
       </div>
     </div>
