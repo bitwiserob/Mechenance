@@ -64,22 +64,28 @@ OUTPUTS:
     <div class="container">
       <div class="card my-4">
         <div class="card-body">
-          <form action="/predict" method="POST">
+          <form action="/predict" method="POST" enctype="multipart/form-data">
             <div class="form-group">
-                <label for="air_temp_input">Air Temp [K]</label>
-                <input type="text" class="form-control" id="air_temp" name="air_temp" placeholder="Enter Air temp">
-        
-                <label for="rpm_input">Rotational speed [rpm]</label>
-                <input type="text" class="form-control" id="rpm_input" name="rpm" placeholder="Enter rotational speed">
-        
-                <label for="nm_input">Torque [Nm]</label>
-                <input type="text" class="form-control" id="nm" name="nm" placeholder="Enter Torque">
-        
-                <label for="min_input">Tool Wear</label>
-                <input type="text" class="form-control" id="min" name="min" placeholder="Enter Tool Wear">
+              <label for="air_temp">Air Temp [K]</label>
+              <input type="text" class="form-control" id="air_temp" name="air_temp" placeholder="Enter Air temp" required>
+          
+              <label for="process_temp">Process Temperature:</label>
+              <input type="text" class="form-control" id="process_temp" name="process_temp" placeholder="Enter Process Temperature" required>
+          
+              <label for="rotational_speed">Rotational speed [rpm]</label>
+              <input type="text" class="form-control" id="rotational_speed" name="rotational_speed" placeholder="Enter rotational speed" required>
+          
+              <label for="torque">Torque [Nm]</label>
+              <input type="text" class="form-control" id="torque" name="torque" placeholder="Enter Torque" required>
+          
+              <label for="tool_wear">Tool Wear</label>
+              <input type="text" class="form-control" id="tool_wear" name="tool_wear" placeholder="Enter Tool Wear" required>
+          
+              <label for="energy_source">Energy Source:</label>
+              <input type="text" class="form-control" id="energy_source" name="energy_source" placeholder="Enter Energy Source" required>
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
+          </form>
         
         </div>
       </div>
