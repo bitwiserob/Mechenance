@@ -1,12 +1,18 @@
 from flask import Flask
 from flask import render_template,request
 from flask_bootstrap import Bootstrap
+from tensorflow.keras.models import load_model
+import pandas as pd
+import numpy as np
 import plotly.graph_objs as go
 import plotly
 import json
-
+from model_manager import ModelManager
 app = Flask(__name__)
 bootstrap = Bootstrap(app)
+model_manager = ModelManager()
+
+
 
 @app.route('/')
 def index():
@@ -38,7 +44,18 @@ def predict():
     graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
     return render_template('predict.html', form_data=form_data,graphJSON=graphJSON)
 
-    
+
+def load_resources():
+    model_manager.load_model('model01', r'./models/pred_01.h5')
+
+    model_manager.load_scaler('scaler_01', r'./models/scaler_pred.pkl')
+
+    model_manager.load_model('model02', r'./models/carb_01.h5')
+
+    model_manager.load_scaler('scaler_02', r'./models/scaler_carb.pkl')
+
+
+load_resources()
+
 if __name__ == '__main__':
     app.run(debug=True)
-#load model on startup

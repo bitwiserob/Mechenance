@@ -137,5 +137,33 @@ def predict():
     return jsonify(response)
     """
 
+
+
+
 if __name__ == '__main__':
     app.run()
+    print("loading model01")
+    # Load model and scaler
+    model_path_01 = r'.\models\pred_01.h5'
+    model_01 = load_trained_model(model_path_01)
+    print("Done loading model01" )
+
+
+    print("loading scaler_01")
+
+    scaler_path_01 = r'.\models\scaler_pred.pkl'
+    scaler_01 = load_scaler(scaler_path_01)
+    print("Done loading scaler_01" )
+
+    print("loading model02")
+
+    model_path_02 = r'.\models\carb_01.h5'
+    model_02 = load_trained_model(model_path_02)
+    # Load model and scaler
+    print("Done loading model02" )
+
+    print("loading scaler_02")
+
+    scaler_path_02 = r'.\models\scaler_carb.pkl'
+    scaler_02 = load_scaler(scaler_path_02)
+    print("loading scaler_02")
