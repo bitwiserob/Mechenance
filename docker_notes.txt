@@ -1,0 +1,4 @@
+##RUNNING###
+docker run -p 5000:5000 78531077217f
+
+[-p host_port:container_port] routes the traffic from localhost 5000 to port 4000 inside the container.
