@@ -95,12 +95,12 @@ def make_df_carb(scaler, air_temp, process_temp, rotational_speed, torque, tool_
     energy_diesel = 0
     energy_grid	= 0
     energy_gas = 0
-
-    if energy_source == 'Natural Gas':
+    
+    if energy_source == '1':
         energy_gas = 1
-    elif energy_source == 'Diesel':
+    elif energy_source == '2':
         energy_diesel = 1
-    elif energy_source == 'Grid Electricity':
+    elif energy_source == '3':
         energy_grid = 1
     else:
         energy_diesel = 0

@@ -82,7 +82,12 @@ OUTPUTS:
               <input type="text" class="form-control" id="tool_wear" name="tool_wear" placeholder="Enter Tool Wear" required>
           
               <label for="energy_source">Energy Source:</label>
-              <input type="text" class="form-control" id="energy_source" name="energy_source" placeholder="Enter Energy Source" required>
+              <select class="form-control" id="energy_source" name="energy_source" required>
+                <option value="">Select Energy Source</option>
+                <option value="1">Natural Gas</option>
+                <option value="2">Diesel</option>
+                <option value="3">Grid Electricity</option>
+              </select>
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
           </form>
