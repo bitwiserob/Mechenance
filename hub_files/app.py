@@ -33,56 +33,7 @@ def make_df_pred(air_temp, process_temp, rotational_speed, torque, tool_wear):
                             'Tool wear [min]': [tool_wear]})
     return test_df
 
-# Make dataframe for carbon footprint calculations
-def make_df_carb(scaler, air_temp, process_temp, rotational_speed, torque, tool_wear, energy_source):
-    power_consumption = torque * rotational_speed * 0.1047 / 0.8
-    time_hr = tool_wear / 60
-    energy_consumption = power_consumption * time_hr / 1000
 
-    energy_diesel = 0
-    energy_grid	= 0
-    energy_gas = 0
-
-    if energy_source == 'Natural Gas':
-        energy_gas = 1
-    elif energy_source == 'Diesel':
-        energy_diesel = 1
-    elif energy_source == 'Grid Electricity':
-        energy_grid = 1
-    else:
-        energy_diesel = 0
-        energy_grid	= 0
-        energy_gas = 0
-
-    test_df_num = pd.DataFrame({'Air temperature [K]': [air_temp], 'Process temperature [K]': [process_temp], 
-                            'Rotational speed [rpm]': [rotational_speed], 'Torque [Nm]': [torque], 
-                            'Tool wear [min]': [tool_wear], 'Power Consumption (W)': [power_consumption],
-                            'Time (Hours)': [time_hr],
-                            'Energy Consumption (kWh)': [energy_consumption]})
-    test_df_cat = pd.DataFrame({'Energy Source_Diesel': [energy_diesel],
-                        'Energy Source_Grid Electricity': [energy_grid], 
-                        'Energy Source_Natural Gas': [energy_gas]})
-
-    test_df_norm = normalize_test_data(scaler, test_df_num)
-    test_df = pd.concat([pd.DataFrame(test_df_norm, columns=test_df_num.columns), test_df_cat], axis=1)
-    return test_df
-
-# Predict the failure
-def predict_failure(model, test_data):
-    prediction = model.predict(test_data)
-    max_prediction_index = np.argmax(prediction)
-
-    failure_types = ['Heat Dissipation Failure', 'No Failure', 'Overstrain Failure', 'Power Failure', 'Tool Failure']
-    prediction_type = failure_types[max_prediction_index]
-    
-    return prediction, prediction_type, max_prediction_index
-
-# Calculate carbon intensity and foot print
-def predict_carbon_footprint(model, test_df):
-    prediction = model.predict(test_df)
-    carbon_intensity = prediction[0][0]
-    carbon_footprint = prediction[0][1]
-    return carbon_intensity, carbon_footprint
 
 
 @app.route('/predict', methods=['GET','POST'])

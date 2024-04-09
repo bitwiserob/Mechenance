@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Prediction Results</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-
-</head>
- <!-- Navbar -->
- <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  </head>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <a class="navbar-brand" href="/">
       <img
         src="{{ url_for('static', filename='brand.png') }}"
@@ -28,37 +30,41 @@
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="container mt-5">
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="/">Home</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="/about">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/contact">Contact</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <body>
+    <div class="container">
+      <h1 class="display-4">Predictive Maintenance</h1>
+      <hr class="my-4" />
+      {% if form_data %}
       <div class="jumbotron">
-        <h1 class="display-4">Predictive Maintenance</h1>
-        <hr class="my-4">
-        <p class="lead">Predicted Failure Type: {{ form_data.prediction_type }}</p>
+        <p class="lead">
+          Predicted Failure Type: {{ form_data.prediction_type }}
+        </p>
         <p class="lead">Confidence Level: {{ form_data.confidence_level }}</p>
         <p class="lead">Carbon Intensity: {{ form_data.carbon_intensity }}</p>
         <p class="lead">Carbon Footprint: {{ form_data.carbon_footprint }}</p>
       </div>
+      {% else %}
+      <p>No data submitted.</p>
+      {% endif %}
+      <div id="plot"></div>
+      <script>
+        var plotData = {{ graphJSON|safe }};
+        Plotly.newPlot('plot', plotData);
+      </script>
     </div>
-<body>
-    <div class="container">
-        <h2 class="pt-2">Prediction Results</h2>
-        {% if form_data %}
-            <div class="card my-4">
-                <div class="card-body">
-                    <p>Air Temp [K]: {{ form_data.air_temp }}</p>
-                    <p>Rotational Speed [rpm]: {{ form_data.rpm }}</p>
-                    <p>Torque [Nm]: {{ form_data.nm }}</p>
-                    <p>Tool Wear: {{ form_data.min }}</p>
-                </div>
-            </div>
-        {% else %}
-            <p>No data submitted.</p>
-        {% endif %}
-        <div id="plot"></div>
-        <script>
-            var plotData = {{ graphJSON|safe }};
-            Plotly.newPlot('plot', plotData);
-        </script>
-    </div>
-    
-</body>
+  </body>
 </html>
