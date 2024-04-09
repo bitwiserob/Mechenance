@@ -3,7 +3,7 @@ name: Deploy to Heroku
 on:
   push:
     branches:
-      - deployment  # Set this to the branch from which you want to deploy
+      - main  # Set this to the branch from which you want to deploy
 
 jobs:
   build-and-deploy:
