@@ -1,11 +1,12 @@
 import pandas as pd
 import numpy as np
-import tensorflow as tf
-from tensorflow.keras.models import load_model
 import joblib
-
+from keras.models import load_model
 from flask import Flask, request, jsonify
 from flask import render_template
+import json
+import plotly
+import plotly.graph_objs as go
 
 app = Flask(__name__)
 
@@ -35,6 +36,9 @@ def make_df_pred(air_temp, process_temp, rotational_speed, torque, tool_wear):
 
 
 
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 @app.route('/predict', methods=['GET','POST'])
 def predict():
@@ -72,11 +76,17 @@ def predict():
         confidence_level = round(float(prediction.max() * 100), 2)
         carbon_intensity = round(float(carbon_intensity), 2)
         carbon_footprint = round(float(carbon_footprint), 2)
-        return render_template('result.html', prediction_type=prediction_type, 
-                               confidence_level=confidence_level, 
-                               carbon_intensity=carbon_intensity, 
-                               carbon_footprint=carbon_footprint)
-    return render_template('index.html')
+    
+    failure_types = ['Heat Dissipation Failure', 'No Failure', 'Overstrain Failure', 'Power Failure', 'Tool Failure']
+    predictions = prediction[0]
+    data = [go.Bar(x= failure_types, y=predictions, marker=dict(color='rgb(158,202,225)'))]
+    graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
+    return render_template('result.html', prediction_type=prediction_type, 
+                            confidence_level=confidence_level, 
+                            carbon_intensity=carbon_intensity, 
+                            carbon_footprint=carbon_footprint,
+                            graphJSON=graphJSON)
+
 
     """
     # Prepare response

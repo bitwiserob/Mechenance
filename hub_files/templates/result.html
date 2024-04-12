@@ -1,7 +1,17 @@
 <html>
-    <h1>Predictive Maintenance</h1>
-    <h3>Predicted Failure Type: {{ prediction_type }}</h3>
-    <h3>Confidence Level: {{ confidence_level }}</h3>
-    <h3>Carbon Intensity: {{ carbon_intensity }}</h3>
-    <h3>Carbon Footprint: {{ carbon_footprint }}</h3>
+    <head>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    </head>
+    <body>
+        <h1>Predictive Maintenance</h1>
+        <h3>Predicted Failure Type: {{ prediction_type }}</h3>
+        <h3>Confidence Level: {{ confidence_level }}</h3>
+        <h3>Carbon Intensity: {{ carbon_intensity }}</h3>
+        <h3>Carbon Footprint: {{ carbon_footprint }}</h3>
+        <div id="plot"></div>
+        <script>
+            var plotData = {{ graphJSON|safe }};
+            Plotly.newPlot('plot', plotData);
+        </script>
+    </body>
 </html>
