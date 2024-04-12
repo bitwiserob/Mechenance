@@ -1,6 +1,5 @@
 import os
-from flask import Flask
-from flask import render_template,request
+from flask import Flask,abort,render_template,request
 from flask_bootstrap import Bootstrap
 from tensorflow.keras.models import load_model
 import pandas as pd
@@ -9,6 +8,16 @@ import plotly.graph_objs as go
 import plotly
 import json
 from model_manager import ModelManager
+from src.db_context import DBContext
+from src.prediction_history import PredictionHistory
+from dotenv import load_dotenv
+import psycopg2
+
+db_connect = False
+db_context = DBContext()
+os.environ["DATABASE_URL"] 
+
+
 app = Flask(__name__)
 bootstrap = Bootstrap(app)
 model_manager = ModelManager()
@@ -28,6 +37,10 @@ def make_df_pred(air_temp, process_temp, rotational_speed, torque, tool_wear):
     return test_df
 
 
+@app.route('/history') 
+def history():
+    prediction_history = db_context.get_all_history() 
+    return render_template('history.html', history=prediction_history)
 
 
 @app.route('/')
@@ -44,46 +57,89 @@ def about():
 def contact():
     return render_template('contact.html')
 
+@app.route('/history/<int:prediction_id>')
+def prediction_details(prediction_id):
+   
+    prediction_record = db_context.find_history_by_id(prediction_id)
+    
+    if prediction_record is None:
+        abort(404) 
 
+    record = PredictionHistory(*prediction_record)
+    return render_template('prediction_details.html', record=record)
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
 
 @app.route('/predict', methods=['GET', 'POST'])
 def predict():
-
     model_01 = model_manager.get_model('model_01')
     scaler_01 = model_manager.get_scaler('scaler_01')
     model_02 = model_manager.get_model('model_02')
     scaler_02 = model_manager.get_scaler('scaler_02')
 
     if request.method == 'POST':
-        air_temp = float(request.form['air_temp'])
-        process_temp = float(request.form['process_temp'])
-        rotational_speed = float(request.form['rotational_speed'])
-        torque = float(request.form['torque'])
-        tool_wear = float(request.form['tool_wear'])
-        energy_source = request.form['energy_source']
+        # Extracting input data from form
+        try:
+            air_temp = float(request.form['air_temp'])
+            process_temp = float(request.form['process_temp'])
+            rotational_speed = int(request.form['rotational_speed'])
+            torque = float(request.form['torque'])
+            tool_wear = int(request.form['tool_wear'])
+            energy_source = int(request.form['energy_source'])
+        except (ValueError, KeyError):
+            # Handle the exception here
+            # You can return an error message or redirect to an error page
+            # For example:
+            return render_template('error.html', message='Invalid input')
 
         # Inference for predictive maintenance
         test_df_01 = make_df_pred(air_temp, process_temp, rotational_speed, torque, tool_wear)
         test_df_norm_01 = normalize_test_data(scaler_01, test_df_01)
         prediction, prediction_type, _ = predict_failure(model_01, test_df_norm_01)
 
+        # Formatting probabilities for storage or display
+        print(prediction)
+        probabilities = prediction.flatten()
+        probabilities_formatted = [round(float(prob * 100), 2) for prob in probabilities]
+        confidence_level = round(float(probabilities.max() * 100), 2)
+
         # Inference for carbon footprint calculations
         test_df_02 = make_df_carb(scaler_02, air_temp, process_temp, rotational_speed, torque, tool_wear, energy_source)
         carbon_intensity, carbon_footprint = predict_carbon_footprint(model_02, test_df_02)
         
         # Format the output
-        confidence_level = round(float(prediction.max() * 100), 2)
         carbon_intensity = round(float(carbon_intensity), 2)
         carbon_footprint = round(float(carbon_footprint), 2)
         form_data = {
             'prediction_type': prediction_type, 
             'confidence_level': confidence_level, 
             'carbon_intensity': carbon_intensity, 
-            'carbon_footprint': carbon_footprint
+            'carbon_footprint': carbon_footprint,
         }
         
+        #save to db
+        history_id = db_context.create_history(air_temp,
+                                                process_temp, 
+                                                rotational_speed, 
+                                                torque, tool_wear, 
+                                                energy_source,
+                                                prediction_type,
+                                                confidence_level,
+                                                carbon_intensity,
+                                                carbon_footprint
+                                                )
+        print("Inserted history record with ID:", history_id)
+        
+
+
+
+
+
+
         return render_template('predict.html', form_data=form_data)
+
     return render_template('index.html')
 
 
@@ -125,11 +181,10 @@ def make_df_carb(scaler, air_temp, process_temp, rotational_speed, torque, tool_
 def predict_failure(model, test_data):
     prediction = model.predict(test_data)
     max_prediction_index = np.argmax(prediction)
-
     failure_types = ['Heat Dissipation Failure', 'No Failure', 'Overstrain Failure', 'Power Failure', 'Tool Failure']
     prediction_type = failure_types[max_prediction_index]
     
-    return prediction, prediction_type, max_prediction_index
+    return prediction.flatten(), prediction_type, max_prediction_index
 
 # Calculate carbon intensity and foot print
 def predict_carbon_footprint(model, test_df):
@@ -152,7 +207,6 @@ def load_resources():
 
 #Load models
 load_resources()
-
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -23,3 +23,5 @@ werkzeug==3.0.2; python_version >= '3.8'
 tensorflow
 joblib
 scikit-learn
+psycopg2
+python-dotenv 

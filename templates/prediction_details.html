@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prediction Detail - Mechenance</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="/">
+            <img src="{{ url_for('static', filename='brand.png') }}" alt="Brand Logo" height="45"/>
+            Mechenance
+        </a>
+        <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+ 
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item ">
+                <a class="nav-link" href="/">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" href="/history">History</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/about">About</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/contact">Contact</a>
+              </li>
+              
+        </ul>
+    </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h2>Prediction Detail</h2>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Prediction ID: {{ record.id }}</h5>
+                <p class="card-text">Air Temperature: {{ record.air_temp }}°C</p>
+                <p class="card-text">Process Temperature: {{ record.process_temp }}°C</p>
+                <p class="card-text">Rotational Speed: {{ record.rotational_speed }} RPM</p>
+                <p class="card-text">Torque: {{ record.torque }} Nm</p>
+                <p class="card-text">Tool Wear: {{ record.tool_wear }} units</p>
+                <p class="card-text">Energy Source: {{ record.energy_source }}</p>
+                <p class="card-text">Timestamp: {{ record.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                <p class="card-text">Prediction Type: {{ record.prediction_type }}</p>
+                <p class="card-text">Confidence Level: {{ record.confidence_level }}%</p>
+                <p class="card-text">Carbon Intensity: {{ record.carbon_intensity }} gCO2/kWh</p>
+                <p class="card-text">Carbon Footprint: {{ record.carbon_footprint }} kgCO2</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>
