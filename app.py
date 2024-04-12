@@ -89,9 +89,7 @@ def predict():
             tool_wear = int(request.form['tool_wear'])
             energy_source = int(request.form['energy_source'])
         except (ValueError, KeyError):
-            # Handle the exception here
-            # You can return an error message or redirect to an error page
-            # For example:
+
             return render_template('error.html', message='Invalid input')
 
         # Inference for predictive maintenance
