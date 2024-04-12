@@ -6,6 +6,12 @@ COPY ./requirements.txt requirements.txt
 
 RUN pip3 install -r requirements.txt 
 
+RUN mkdir -p /root/.postgresql && chmod 700 /root/.postgresql
+
+COPY root.crt /root/.postgresql/root.crt
+
+ENV DATABASE_URL = ""
+
 COPY . .
 
-CMD gunicorn --bind 0.0.0.0:$PORT app:app
+CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]

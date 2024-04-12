@@ -81,12 +81,18 @@ def predict():
 
     if request.method == 'POST':
         # Extracting input data from form
-        air_temp = float(request.form['air_temp'])
-        process_temp = float(request.form['process_temp'])
-        rotational_speed = int(request.form['rotational_speed'])
-        torque = float(request.form['torque'])
-        tool_wear = int(request.form['tool_wear'])
-        energy_source = int(request.form['energy_source'])
+        try:
+            air_temp = float(request.form['air_temp'])
+            process_temp = float(request.form['process_temp'])
+            rotational_speed = int(request.form['rotational_speed'])
+            torque = float(request.form['torque'])
+            tool_wear = int(request.form['tool_wear'])
+            energy_source = int(request.form['energy_source'])
+        except (ValueError, KeyError):
+            # Handle the exception here
+            # You can return an error message or redirect to an error page
+            # For example:
+            return render_template('error.html', message='Invalid input')
 
         # Inference for predictive maintenance
         test_df_01 = make_df_pred(air_temp, process_temp, rotational_speed, torque, tool_wear)
