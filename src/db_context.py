@@ -78,49 +78,25 @@ class DBContext:
                     carbon_footprint
                 )
             )
-            device_id = cur.fetchone()[0]  # Fetch the returned ID
-            return device_id
+            history_id = cur.fetchone()[0]  # Fetch the returned ID
+            return history_id
 
-    def find_device_by_id(self, device_id):
+    def find_history_by_id(self, history_id):
         """Finds a device by its primary key ID"""
         with self as cur:
             cur.execute(
                 """
                 SELECT * FROM device WHERE id = %s
                 """,
-                (device_id,)
+                (history_id,)
             )
-        return cur.fetchone()  # Might return None if no device is found
+            return cur.fetchone()  # Might return None if no device is found
 
-    def find_devices_by_type(self, device_type):
-        """Finds devices based on their type"""
+    
+    def get_all_history(self):
         with self as cur:
-            cur.execute(
-                """
-                SELECT * FROM device WHERE device_type = %s
-                """,
-                (device_type,)
-            )
+            cur.execute("""
+            SELECT * FROM prediction_history
+            """)
             return cur.fetchall()
-
-    def update_device(self, device_id, device_name, mac_address, device_type):
-        """Updates an existing device"""
-        with self as cur:
-            cur.execute(
-                """
-                UPDATE device
-                SET device_name = %s, mac_address = %s, device_type = %s
-                WHERE id = %s
-                """,
-                (device_name, mac_address, device_type, device_id)
-            )
-
-    def delete_device(self, device_id):
-        """Deletes a device"""
-        with self as cur:
-            cur.execute(
-                """
-                DELETE FROM device WHERE id = %s
-                """,
-                (device_id,)
-            )
+            
