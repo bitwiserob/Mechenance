@@ -39,8 +39,13 @@ def make_df_pred(air_temp, process_temp, rotational_speed, torque, tool_wear):
 
 @app.route('/history') 
 def history():
-    prediction_history = db_context.get_all_history()  # fetch data from database
+    prediction_history = db_context.get_all_history() 
     return render_template('history.html', history=prediction_history)
+
+@app.route('/t')
+def t():
+    prediction_history = db_context.get_all_history() 
+    return(prediction_history)
 
 
 

@@ -2,7 +2,7 @@ import psycopg2
 import os
 import logging
 import sys
-
+from src.prediction_history import PredictionHistory
 from dotenv import load_dotenv
 
 class DBContext:
@@ -98,5 +98,6 @@ class DBContext:
             cur.execute("""
             SELECT * FROM prediction_history
             """)
-            return cur.fetchall()
+            return [PredictionHistory(*record) for record in cur.fetchall()]
+
             

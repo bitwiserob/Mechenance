@@ -1,79 +1,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Contact - Mechenance</title>
-    <!-- Bootstrap CSS -->
+    <title>Prediction History - Mechenance</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
 </head>
 <body>
-    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <a class="navbar-brand" href="/">
-        <img src="{{ url_for('static', filename='brand.png') }}" alt="Brand Logo" height="45"/>
-        Mechenance
-      </a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+        <a class="navbar-brand" href="/">
+            <img src="{{ url_for('static', filename='brand.png') }}" alt="Brand Logo" height="45"/>
+            Mechenance
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="/">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/about">About</a>
-          </li>
-          <li class="nav-item active">
-            <a class="nav-link" href="/contact">Contact</a>
-          </li>
-        </ul>
-      </div>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/history">History</a>
+                </li>
+            </ul>
+        </div>
     </nav>
+    {{history}}
 
-    <!-- Database Table Information -->
-    <div class="container">
-        <h2 class="pt-4">Prediction History Table Schema</h2>
-        <dl class="row">
-            <dt class="col-sm-3">ID (INT8)</dt>
-            <dd class="col-sm-9">Unique row identifier, auto-generated.</dd>
-
-            <dt class="col-sm-3">Air Temperature (FLOAT4)</dt>
-            <dd class="col-sm-9">Air temperature measurement.</dd>
-
-            <dt class="col-sm-3">Process Temperature (FLOAT4)</dt>
-            <dd class="col-sm-9">Process temperature measurement.</dd>
-
-            <dt class="col-sm-3">Rotational Speed (INT8)</dt>
-            <dd class="col-sm-9">Speed at which the machine operates.</dd>
-
-            <dt class="col-sm-3">Torque (FLOAT4)</dt>
-            <dd class="col-sm-9">Torque measurement.</dd>
-
-            <dt class="col-sm-3">Tool Wear (FLOAT4)</dt>
-            <dd class="col-sm-9">Measurement of tool wear.</dd>
-
-            <dt class="col-sm-3">Energy Source (INT8)</dt>
-            <dd class="col-sm-9">Identifier for the energy source used.</dd>
-
-            <dt class="col-sm-3">Timestamp (TIMESTAMPTZ)</dt>
-            <dd class="col-sm-9">Timestamp of the record, auto-generated.</dd>
-
-            <dt class="col-sm-3">Prediction Type (VARCHAR)</dt>
-            <dd class="col-sm-9">Type of prediction.</dd>
-
-            <dt class="col-sm-3">Confidence Level (FLOAT4)</dt>
-            <dd class="col-sm-9">Confidence level of the prediction.</dd>
-
-            <dt class="col-sm-3">Carbon Intensity (FLOAT4)</dt>
-            <dd class="col-sm-9">Carbon intensity measurement.</dd>
-
-            <dt class="col-sm-3">Carbon Footprint (FLOAT4)</dt>
-            <dd class="col-sm-9">Carbon footprint measurement.</dd>
-        </dl>
+    
+    <div class="container mt-5">
+        <h2>Prediction History</h2>
+        <div class="list-group">
+            {% for record in history %}
+            <a href="/history/{{ record.id }}" class="list-group-item list-group-item-action flex-column align-items-start">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">Prediction ID: {{ record.id }}</h5>
+                    <small>Date: {{ record.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                </div>
+                <button class="btn btn-primary">View Details</button>
+            </a>
+            {% endfor %}
+        </div>
     </div>
 
-    <!-- Bootstrap JS (Optional) -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
