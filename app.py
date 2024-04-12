@@ -1,6 +1,5 @@
 import os
-from flask import Flask
-from flask import render_template,request
+from flask import Flask,abort,render_template,request
 from flask_bootstrap import Bootstrap
 from tensorflow.keras.models import load_model
 import pandas as pd
@@ -10,6 +9,7 @@ import plotly
 import json
 from model_manager import ModelManager
 from src.db_context import DBContext
+from src.prediction_history import PredictionHistory
 from dotenv import load_dotenv
 import psycopg2
 
@@ -42,20 +42,6 @@ def history():
     prediction_history = db_context.get_all_history() 
     return render_template('history.html', history=prediction_history)
 
-@app.route('/t')
-def t():
-    prediction_history = db_context.get_all_history() 
-    return(prediction_history)
-
-
-
-@app.route('/update')
-def test_1():
-    history_id = db_context.create_history(23.5, 180.0, 1200, 35.0, 10, 2)
-    print("Inserted history record with ID:", history_id)
-    return f"{history_id}"
-
-
 
 @app.route('/')
 def index():
@@ -71,7 +57,19 @@ def about():
 def contact():
     return render_template('contact.html')
 
+@app.route('/history/<int:prediction_id>')
+def prediction_details(prediction_id):
+   
+    prediction_record = db_context.find_history_by_id(prediction_id)
+    
+    if prediction_record is None:
+        abort(404) 
 
+    record = PredictionHistory(*prediction_record)
+    return render_template('prediction_details.html', record=record)
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
 
 @app.route('/predict', methods=['GET', 'POST'])

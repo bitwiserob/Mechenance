@@ -71,7 +71,6 @@ class DBContext:
                     torque, 
                     tool_wear, 
                     energy_source, 
-                    
                     prediction_type, 
                     confidence_level, 
                     carbon_intensity, 
@@ -86,7 +85,7 @@ class DBContext:
         with self as cur:
             cur.execute(
                 """
-                SELECT * FROM device WHERE id = %s
+                SELECT * FROM prediction_history WHERE id = %s
                 """,
                 (history_id,)
             )
