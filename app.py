@@ -1,5 +1,5 @@
 import os
-from flask import Flask,abort,render_template,request
+from flask import Flask, abort, render_template, request, redirect, url_for
 from flask_bootstrap import Bootstrap
 from tensorflow.keras.models import load_model
 import pandas as pd
@@ -15,174 +15,228 @@ import psycopg2
 
 db_connect = False
 db_context = DBContext()
-os.environ["DATABASE_URL"] 
+os.environ["DATABASE_URL"]
 
 
 app = Flask(__name__)
 bootstrap = Bootstrap(app)
 model_manager = ModelManager()
 
+
 # Normalize the test data
 def normalize_test_data(scaler, test_df):
     test_df_norm = pd.DataFrame(scaler.transform(test_df), columns=test_df.columns)
     return test_df_norm
 
+
 # Make dataframe for predictive maintenance
 def make_df_pred(air_temp, process_temp, rotational_speed, torque, tool_wear):
-    test_df = pd.DataFrame({'Air temperature [K]': [air_temp], 
-                            'Process temperature [K]': [process_temp], 
-                            'Rotational speed [rpm]': [rotational_speed], 
-                            'Torque [Nm]': [torque], 
-                            'Tool wear [min]': [tool_wear]})
+    test_df = pd.DataFrame(
+        {
+            "Air temperature [K]": [air_temp],
+            "Process temperature [K]": [process_temp],
+            "Rotational speed [rpm]": [rotational_speed],
+            "Torque [Nm]": [torque],
+            "Tool wear [min]": [tool_wear],
+        }
+    )
     return test_df
 
 
-@app.route('/history') 
+@app.route("/history")
 def history():
-    prediction_history = db_context.get_all_history() 
-    return render_template('history.html', history=prediction_history)
+    prediction_history = db_context.get_all_history()
+    return render_template("history.html", history=prediction_history)
 
 
-@app.route('/')
+@app.route("/")
 def index():
-    return render_template('index.html')
+    return render_template("index.html")
 
 
-@app.route('/about', methods=['GET'])
+@app.route("/about", methods=["GET"])
 def about():
-    return render_template('about.html')
+    return render_template("about.html")
 
 
-@app.route('/contact', methods=['GET'])
+@app.route("/contact", methods=["GET"])
 def contact():
-    return render_template('contact.html')
+    return render_template("contact.html")
 
-@app.route('/history/<int:prediction_id>')
+
+@app.route("/history/<int:prediction_id>")
 def prediction_details(prediction_id):
-   
+
     prediction_record = db_context.find_history_by_id(prediction_id)
-    
+    print(prediction_record)
     if prediction_record is None:
-        abort(404) 
-
+        abort(404)
+    print(prediction_record)
     record = PredictionHistory(*prediction_record)
-    return render_template('prediction_details.html', record=record)
 
-if __name__ == '__main__':
+    predictions = [record.label0, record.label1, record.label2, record.label3]
+    failure_types = ['Heat Dissipation Failure', 'No Failure', 'Overstrain Failure', 'Power Failure']
+    data = [go.Pie(labels=failure_types, values=predictions, marker=dict(colors=['#96D38C', '#FEBFB3', '#E1396C', '#96D38C']))]
+    graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
+
+
+    return render_template("prediction_details.html", record=record,graphJSON01=graphJSON)
+
+
+if __name__ == "__main__":
     app.run(debug=True)
 
 
-@app.route('/predict', methods=['GET', 'POST'])
+@app.route("/predict", methods=["GET", "POST"])
 def predict():
-    model_01 = model_manager.get_model('model_01')
-    scaler_01 = model_manager.get_scaler('scaler_01')
-    model_02 = model_manager.get_model('model_02')
-    scaler_02 = model_manager.get_scaler('scaler_02')
+    model_01 = model_manager.get_model("model_01")
+    scaler_01 = model_manager.get_scaler("scaler_01")
+    model_02 = model_manager.get_model("model_02")
+    scaler_02 = model_manager.get_scaler("scaler_02")
 
-    if request.method == 'POST':
+    if request.method == "POST":
         # Extracting input data from form
         try:
-            air_temp = float(request.form['air_temp'])
-            process_temp = float(request.form['process_temp'])
-            rotational_speed = int(request.form['rotational_speed'])
-            torque = float(request.form['torque'])
-            tool_wear = int(request.form['tool_wear'])
-            energy_source = int(request.form['energy_source'])
+            air_temp = float(request.form["air_temp"])
+            process_temp = float(request.form["process_temp"])
+            rotational_speed = int(request.form["rotational_speed"])
+            torque = float(request.form["torque"])
+            tool_wear = int(request.form["tool_wear"])
+            energy_source = int(request.form["energy_source"])
+            run_frequency = int(request.form["run_frequency"])
         except (ValueError, KeyError):
 
-            return render_template('error.html', message='Invalid input')
+            return render_template("error.html", message="Invalid input")
 
         # Inference for predictive maintenance
-        test_df_01 = make_df_pred(air_temp, process_temp, rotational_speed, torque, tool_wear)
+        test_df_01 = make_df_pred(
+            air_temp, process_temp, rotational_speed, torque, tool_wear
+        )
         test_df_norm_01 = normalize_test_data(scaler_01, test_df_01)
         prediction, prediction_type, _ = predict_failure(model_01, test_df_norm_01)
 
         # Formatting probabilities for storage or display
-        print(prediction)
         probabilities = prediction.flatten()
-        probabilities_formatted = [round(float(prob * 100), 2) for prob in probabilities]
+        probabilities_formatted = [
+            round(float(prob * 100), 2) for prob in probabilities
+        ]
         confidence_level = round(float(probabilities.max() * 100), 2)
 
         # Inference for carbon footprint calculations
-        test_df_02 = make_df_carb(scaler_02, air_temp, process_temp, rotational_speed, torque, tool_wear, energy_source)
-        carbon_intensity, carbon_footprint = predict_carbon_footprint(model_02, test_df_02)
-        
+        test_df_02 = make_df_carb(
+            scaler_02,
+            air_temp,
+            process_temp,
+            rotational_speed,
+            torque,
+            tool_wear,
+            energy_source,
+        )
+        carbon_intensity, carbon_footprint = predict_carbon_footprint(
+            model_02, test_df_02
+        )
+
         # Format the output
         carbon_intensity = round(float(carbon_intensity), 2)
         carbon_footprint = round(float(carbon_footprint), 2)
-        form_data = {
-            'prediction_type': prediction_type, 
-            'confidence_level': confidence_level, 
-            'carbon_intensity': carbon_intensity, 
-            'carbon_footprint': carbon_footprint,
-        }
-        
-        #save to db
-        history_id = db_context.create_history(air_temp,
-                                                process_temp, 
-                                                rotational_speed, 
-                                                torque, tool_wear, 
-                                                energy_source,
-                                                prediction_type,
-                                                confidence_level,
-                                                carbon_intensity,
-                                                carbon_footprint
-                                                )
-        print("Inserted history record with ID:", history_id)
-        
 
+        print(prediction)
+        predictions = prediction[0]
+        print(probabilities)
 
+        label0 = float(probabilities[0])
+        label1 = float(probabilities[1])
+        label2 = float(probabilities[2])
+        label3 = float(probabilities[3])
+        # save to db
+        saved_record_id = db_context.create_history(
+            air_temp=air_temp,
+            process_temp=process_temp,
+            rotational_speed=rotational_speed,
+            torque=torque,
+            tool_wear=tool_wear,
+            energy_source=energy_source,
+            prediction_type=prediction_type,
+            confidence_level=confidence_level,
+            carbon_intensity=carbon_intensity,
+            carbon_footprint=carbon_footprint,
+            run_frequency=run_frequency,
+            label0=label0,
+            label1=label1,
+            label2=label2,
+            label3=label3,
 
+        )
+        return redirect(url_for("prediction_details", prediction_id=saved_record_id))
 
-
-
-        return render_template('predict.html', form_data=form_data)
-
-    return render_template('index.html')
+    return render_template("index.html")
 
 
 # Make dataframe for carbon footprint calculations
-def make_df_carb(scaler, air_temp, process_temp, rotational_speed, torque, tool_wear, energy_source):
+def make_df_carb(
+    scaler, air_temp, process_temp, rotational_speed, torque, tool_wear, energy_source
+):
     power_consumption = torque * rotational_speed * 0.1047 / 0.8
     time_hr = tool_wear / 60
     energy_consumption = power_consumption * time_hr / 1000
 
     energy_diesel = 0
-    energy_grid	= 0
+    energy_grid = 0
     energy_gas = 0
-    
-    if energy_source == '1':
+
+    if energy_source == "1":
         energy_gas = 1
-    elif energy_source == '2':
+    elif energy_source == "2":
         energy_diesel = 1
-    elif energy_source == '3':
+    elif energy_source == "3":
         energy_grid = 1
     else:
         energy_diesel = 0
-        energy_grid	= 0
+        energy_grid = 0
         energy_gas = 0
 
-    test_df_num = pd.DataFrame({'Air temperature [K]': [air_temp], 'Process temperature [K]': [process_temp], 
-                            'Rotational speed [rpm]': [rotational_speed], 'Torque [Nm]': [torque], 
-                            'Tool wear [min]': [tool_wear], 'Power Consumption (W)': [power_consumption],
-                            'Time (Hours)': [time_hr],
-                            'Energy Consumption (kWh)': [energy_consumption]})
-    test_df_cat = pd.DataFrame({'Energy Source_Diesel': [energy_diesel],
-                        'Energy Source_Grid Electricity': [energy_grid], 
-                        'Energy Source_Natural Gas': [energy_gas]})
+    test_df_num = pd.DataFrame(
+        {
+            "Air temperature [K]": [air_temp],
+            "Process temperature [K]": [process_temp],
+            "Rotational speed [rpm]": [rotational_speed],
+            "Torque [Nm]": [torque],
+            "Tool wear [min]": [tool_wear],
+            "Power Consumption (W)": [power_consumption],
+            "Time (Hours)": [time_hr],
+            "Energy Consumption (kWh)": [energy_consumption],
+        }
+    )
+    test_df_cat = pd.DataFrame(
+        {
+            "Energy Source_Diesel": [energy_diesel],
+            "Energy Source_Grid Electricity": [energy_grid],
+            "Energy Source_Natural Gas": [energy_gas],
+        }
+    )
 
     test_df_norm = normalize_test_data(scaler, test_df_num)
-    test_df = pd.concat([pd.DataFrame(test_df_norm, columns=test_df_num.columns), test_df_cat], axis=1)
+    test_df = pd.concat(
+        [pd.DataFrame(test_df_norm, columns=test_df_num.columns), test_df_cat], axis=1
+    )
     return test_df
+
 
 # Predict the failure
 def predict_failure(model, test_data):
     prediction = model.predict(test_data)
     max_prediction_index = np.argmax(prediction)
-    failure_types = ['Heat Dissipation Failure', 'No Failure', 'Overstrain Failure', 'Power Failure', 'Tool Failure']
+    failure_types = [
+        "Heat Dissipation Failure",
+        "No Failure",
+        "Overstrain Failure",
+        "Power Failure",
+        "Tool Failure",
+    ]
     prediction_type = failure_types[max_prediction_index]
-    
+
     return prediction.flatten(), prediction_type, max_prediction_index
+
 
 # Calculate carbon intensity and foot print
 def predict_carbon_footprint(model, test_df):
@@ -192,19 +246,15 @@ def predict_carbon_footprint(model, test_df):
     return carbon_intensity, carbon_footprint
 
 
-
 def load_resources():
-    model_manager.load_model('model_01', r'./models/pred_01.h5')
-    model_manager.load_scaler('scaler_01', r'./models/scaler_pred.pkl')
-    model_manager.load_model('model_02', r'./models/carb_01.h5')
-    model_manager.load_scaler('scaler_02', r'./models/scaler_carb.pkl')
+    model_manager.load_model("model_01", r"./models/pred_01.h5")
+    model_manager.load_scaler("scaler_01", r"./models/scaler_pred.pkl")
+    model_manager.load_model("model_02", r"./models/carb_01.h5")
+    model_manager.load_scaler("scaler_02", r"./models/scaler_carb.pkl")
 
 
-
-
-
-#Load models
+# Load models
 load_resources()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)

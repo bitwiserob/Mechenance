@@ -1,16 +1,67 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Prediction Detail - Mechenance</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
-</head>
-<body>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <style>
+   
+      .card-body {
+        display: flex;
+        width: 100%;
+        flex-wrap: wrap; /* Allows items to wrap as needed */
+      }
+      .card-left,
+      .card-right {
+        flex: 1; /* both children will take up equal space */
+        padding: 10px; /* adds some padding around the content */
+      }
+      .card-right {
+        min-width: 200px; /* ensures the plot area does not get too small */
+      }
+      @media (max-width: 768px) {
+        /* Adjusts layout for screens smaller than 768 pixels */
+        .card-left,
+        .card-right {
+          flex-basis: 100%; /* On smaller screens, take full width */
+          max-width: 100%; /* On smaller screens, take full width */
+          min-width: 100%; /* On smaller screens, take full width */
+        }
+      }
+      .card-text strong {
+        font-weight: bold; /* Makes the label bold */
+      }
+
+      .card-text span {
+        color: #555; /* Dark gray color for the values to stand out less */
+      }
+
+      .card-text .important {
+        font-weight: bold;
+        color: #d9534f; /* Red color for important information like prediction type */
+      }
+
+      .card-text .confident {
+        font-weight: bold;
+        color: #5cb85c; /* Green color for high confidence level */
+      }
+    </style>
+  </head>
+  <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="/">
-            <img src="{{ url_for('static', filename='brand.png') }}" alt="Brand Logo" height="45"/>
-            Mechenance
-        </a>
-        <button
+      <a class="navbar-brand" href="/">
+        <img
+          src="{{ url_for('static', filename='brand.png') }}"
+          alt="Brand Logo"
+          height="45"
+        />
+        Mechenance
+      </a>
+      <button
         class="navbar-toggler"
         type="button"
         data-toggle="collapse"
@@ -21,49 +72,111 @@
       >
         <span class="navbar-toggler-icon"></span>
       </button>
- 
+
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item ">
-                <a class="nav-link" href="/">Home</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link active" href="/history">History</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/about">About</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/contact">Contact</a>
-              </li>
-              
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="/history">History</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/about">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/contact">Contact</a>
+          </li>
         </ul>
-    </div>
+      </div>
     </nav>
 
     <div class="container mt-5">
-        <h2>Prediction Detail</h2>
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Prediction ID: {{ record.id }}</h5>
-                <p class="card-text">Air Temperature: {{ record.air_temp }}°C</p>
-                <p class="card-text">Process Temperature: {{ record.process_temp }}°C</p>
-                <p class="card-text">Rotational Speed: {{ record.rotational_speed }} RPM</p>
-                <p class="card-text">Torque: {{ record.torque }} Nm</p>
-                <p class="card-text">Tool Wear: {{ record.tool_wear }} units</p>
-                <p class="card-text">Energy Source: {{ record.energy_source }}</p>
-                <p class="card-text">Timestamp: {{ record.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</p>
-                <p class="card-text">Prediction Type: {{ record.prediction_type }}</p>
-                <p class="card-text">Confidence Level: {{ record.confidence_level }}%</p>
-                <p class="card-text">Carbon Intensity: {{ record.carbon_intensity }} gCO2/kWh</p>
-                <p class="card-text">Carbon Footprint: {{ record.carbon_footprint }} kgCO2</p>
-            </div>
+      <h2>Prediction Detail</h2>
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5>Prediction ID: <strong>{{ record.id }}</strong></h5>
+          <p class="card-time">Timestamp: {{ record.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</p>
         </div>
+        <div class="card-body">
+          <div class="card-left">
+            <p class="card-text">
+              <strong>Air Temperature:</strong>
+              <span style="color: #555">{{ record.air_temp }}°C</span>
+            </p>
+            <p class="card-text">
+              <strong>Process Temperature:</strong>
+              <span style="color: #555">{{ record.process_temp }}°C</span>
+            </p>
+            <p class="card-text">
+              <strong>Rotational Speed:</strong>
+              <span style="color: #555">{{ record.rotational_speed }} RPM</span>
+            </p>
+            <p class="card-text">
+              <strong>Torque:</strong>
+              <span style="color: #555">{{ record.torque }} Nm</span>
+            </p>
+            <p class="card-text">
+              <strong>Tool Wear:</strong>
+              <span style="color: #555">{{ record.tool_wear }} units</span>
+            </p>
+            <p class="card-text">
+              <strong>Energy Source:</strong>
+              <span style="color: #555">{{ record.energy_source }}</span>
+            </p>
+            <p class="card-text">
+              <strong>Timestamp:</strong>
+              <span style="color: #555"
+                >{{ record.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</span
+              >
+            </p>
+            <p class="card-text">
+              <strong>Prediction Type:</strong>
+              <span style="font-weight: bold; color: #d9534f"
+                >{{ record.prediction_type }}</span
+              >
+            </p>
+            <p class="card-text">
+              <strong>Confidence Level:</strong>
+              <span style="font-weight: bold; color: #5cb85c"
+                >{{ record.confidence_level }}%</span
+              >
+            </p>
+            <p class="card-text">
+              <strong>Carbon Intensity:</strong>
+              <span style="color: #555"
+                >{{ record.carbon_intensity }} gCO2/kWh</span
+              >
+            </p>
+            <p class="card-text">
+              <strong>Carbon Footprint:</strong>
+              <span style="color: #555"
+                >{{ record.carbon_footprint }} kgCO2</span
+              >
+            </p>
+            <p class="card-text">
+              <strong>Run Frequency:</strong>
+              <span style="color: #555"
+                >{{ record.run_frequency }} Daily run frequency</span
+              >
+            </p>
+          </div>
+
+          <div class="card-right">
+            <div id="plot"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+      var plotData1 = {{ graphJSON01|safe }}
+      var plotData2 = {{ graphJSON02|safe }}
 
-</body>
+      Plotly.newPlot('plot', plotData1,{})
+    </script>
+  </body>
 </html>

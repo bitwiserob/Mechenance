@@ -6,7 +6,7 @@ from src.prediction_history import PredictionHistory
 from dotenv import load_dotenv
 
 class DBContext:
-
+    
     def __init__(self):
         load_dotenv()
         self.connection_string = os.environ["DATABASE_URL"]
@@ -38,13 +38,23 @@ class DBContext:
                 logging.info('Connection opened successfully.')
 
 
-    def create_history(self,air_temp, process_temp, rotational_speed, torque, tool_wear, energy_source, 
-                       prediction_type,
-                       confidence_level,
-                       carbon_intensity,
-                       carbon_footprint,
+    def create_history(self, air_temp, 
+                    process_temp, 
+                    rotational_speed, 
+                    torque, 
+                    tool_wear, 
+                    energy_source, 
+                    prediction_type, 
+                    confidence_level, 
+                    carbon_intensity, 
+                    carbon_footprint,
+                    run_frequency,
+                    label0,
+                    label1,
+                    label2,
+                    label3):
                        
-                       ):
+                    
         """Inserts a new history record"""
         with self as cur:
             cur.execute(
@@ -59,9 +69,14 @@ class DBContext:
                     prediction_type, 
                     confidence_level, 
                     carbon_intensity, 
-                    carbon_footprint
+                    carbon_footprint,
+                    run_frequency,
+                    label0,
+                    label1,
+                    label2,
+                    label3
                 )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s)
                 RETURNING id
                 """,
                 (
@@ -74,7 +89,12 @@ class DBContext:
                     prediction_type, 
                     confidence_level, 
                     carbon_intensity, 
-                    carbon_footprint
+                    carbon_footprint,
+                    run_frequency,
+                    label0,
+                    label1,
+                    label2,
+                    label3
                 )
             )
             history_id = cur.fetchone()[0]  # Fetch the returned ID
@@ -96,6 +116,7 @@ class DBContext:
         with self as cur:
             cur.execute("""
             SELECT * FROM prediction_history
+            ORDER BY timestamp DESC 
             """)
             return [PredictionHistory(*record) for record in cur.fetchall()]
 

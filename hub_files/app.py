@@ -79,6 +79,7 @@ def predict():
     
     failure_types = ['Heat Dissipation Failure', 'No Failure', 'Overstrain Failure', 'Power Failure', 'Tool Failure']
     predictions = prediction[0]
+    print(predictions)
     data = [go.Bar(x= failure_types, y=predictions, marker=dict(color='rgb(158,202,225)'))]
     graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
     return render_template('result.html', prediction_type=prediction_type, 
