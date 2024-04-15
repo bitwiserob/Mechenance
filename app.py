@@ -12,6 +12,8 @@ from src.db_context import DBContext
 from src.prediction_history import PredictionHistory
 from dotenv import load_dotenv
 import psycopg2
+from plotly.subplots import make_subplots
+import plotly.express as px
 
 db_connect = False
 db_context = DBContext()
@@ -66,25 +68,40 @@ def contact():
 
 @app.route("/history/<int:prediction_id>")
 def prediction_details(prediction_id):
-
     prediction_record = db_context.find_history_by_id(prediction_id)
-    print(prediction_record)
     if prediction_record is None:
         abort(404)
-    print(prediction_record)
+
     record = PredictionHistory(*prediction_record)
+    failure_types = [
+        "Heat Dissipation Failure",
+        "No Failure",
+        "Overstrain Failure",
+        "Power Failure",
+        "Tool Failure",
+    ]
+    predictions = [
+        round(record.label0, 3),
+        round(record.label1, 3),
+        round(record.label2, 3),
+        round(record.label3, 3),
+        round(record.label4, 3),
+    ]
+    failure_predictions_dict = dict(zip(failure_types, predictions))
 
-    predictions = [record.label0, record.label1, record.label2, record.label3]
-    failure_types = ['Heat Dissipation Failure', 'No Failure', 'Overstrain Failure', 'Power Failure']
-    data = [go.Pie(labels=failure_types, values=predictions, marker=dict(colors=['#96D38C', '#FEBFB3', '#E1396C', '#96D38C']))]
-    graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
+    fig = px.pie(
+        values=predictions, names=failure_types, hole=0.3, width=500, height=400
+    )
 
+    fig.update_layout(margin=dict(t=0, b=0, l=0, r=0))
 
-    return render_template("prediction_details.html", record=record,graphJSON01=graphJSON)
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
+    graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+    return render_template(
+        "prediction_details.html",
+        record=record,
+        graphJSON=graphJSON,
+        failure_predictions=failure_predictions_dict,
+    )
 
 
 @app.route("/predict", methods=["GET", "POST"])
@@ -114,7 +131,7 @@ def predict():
         )
         test_df_norm_01 = normalize_test_data(scaler_01, test_df_01)
         prediction, prediction_type, _ = predict_failure(model_01, test_df_norm_01)
-
+        print(prediction)
         # Formatting probabilities for storage or display
         probabilities = prediction.flatten()
         probabilities_formatted = [
@@ -148,6 +165,9 @@ def predict():
         label1 = float(probabilities[1])
         label2 = float(probabilities[2])
         label3 = float(probabilities[3])
+        label4 = float(probabilities[4])
+
+        print(f"{label0}: {label1}: {label2}: {label3}: {label4}")
         # save to db
         saved_record_id = db_context.create_history(
             air_temp=air_temp,
@@ -165,7 +185,7 @@ def predict():
             label1=label1,
             label2=label2,
             label3=label3,
-
+            label4=label4,
         )
         return redirect(url_for("prediction_details", prediction_id=saved_record_id))
 
@@ -257,4 +277,5 @@ def load_resources():
 load_resources()
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = os.getenv("PORT") or 5000
+    app.run(host="0.0.0.0", port=int(port), debug=True)

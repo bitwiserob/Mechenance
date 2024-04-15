@@ -52,7 +52,8 @@ class DBContext:
                     label0,
                     label1,
                     label2,
-                    label3):
+                    label3,
+                    label4):
                        
                     
         """Inserts a new history record"""
@@ -74,9 +75,10 @@ class DBContext:
                     label0,
                     label1,
                     label2,
-                    label3
+                    label3,
+                    label4
                 )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s,%s)
                 RETURNING id
                 """,
                 (
@@ -94,7 +96,8 @@ class DBContext:
                     label0,
                     label1,
                     label2,
-                    label3
+                    label3,
+                    label4
                 )
             )
             history_id = cur.fetchone()[0]  # Fetch the returned ID
