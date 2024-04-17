@@ -120,7 +120,7 @@ def predict():
             torque = float(request.form["torque"])
             tool_wear = int(request.form["tool_wear"])
             energy_source = int(request.form["energy_source"])
-            run_frequency = int(request.form["run_frequency"])
+            run_frequency = int(1)
         except (ValueError, KeyError):
 
             return render_template("error.html", message="Invalid input")
