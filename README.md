@@ -5,4 +5,4 @@ DOCUMENTS contains report and slides folder contains the presentation slides and
 
 [Report](./DOCUMENTS/report-draft.docx)
 [Slide Deck](./slidedeck.pptx)
-[Demo](https://github.com/bitwiserob/Mechenance)
+[Demo](https://mechenance-900ac7459385.herokuapp.com/)
