@@ -5,5 +5,5 @@ A fullstack application for making predictions for predictive maintenance.
 
 DOCUMENTS contains report and slides folder contains the presentation slides and report.
 
-- [Report](./DOCUMENTS/report-draft.docx)
+- [Report](./DOCUMENTS/report.docx)
 - [Slide Deck](./DOCUMENTS//slidedeck.pptx)
