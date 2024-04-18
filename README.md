@@ -1,4 +1,7 @@
 ﻿# Mechenance
 A fullstack application for making predictions for predictive maintenance. 
 
-DOCUMENTS contain report and slides folder contains the presentation slides and report.
+DOCUMENTS contains report and slides folder contains the presentation slides and report.
+
+[Report](./DOCUMENTS/report-draft.docx)
+[Slide Deck](./slidedeck.pptx)
